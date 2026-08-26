@@ -115,6 +115,10 @@ class YouTubeWebViewEventHandler {
       // Notify callback
       callbacks.onControllerCreated?.call(controller);
       controller.isReady = true;
+      if (configuration.videoSourceConfiguration.autoPlay &&
+          !controller.isPlaying) {
+        await controller.play();
+      }
     } finally {
       _initializing = false;
     }

@@ -171,6 +171,10 @@ class _OmniVideoPlayerControlsOverlayState
 
   @override
   Widget build(BuildContext context) {
+    if (widget.configuration.playerUIVisibilityOptions.hidesFlutterOverlay) {
+      return widget.child;
+    }
+
     final theme = OmniVideoPlayerTheme.of(context)!;
 
     final opts = widget.configuration.playerUIVisibilityOptions;

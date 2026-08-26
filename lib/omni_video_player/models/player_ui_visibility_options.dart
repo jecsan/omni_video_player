@@ -158,6 +158,19 @@ class PlayerUIVisibilityOptions {
   /// Defaults to `false`.
   final bool enableZoom;
 
+  /// Texture-composited platform views (YouTube iOS WebView) go black when any
+  /// Flutter widget is stacked above them. True when the app has turned every
+  /// Omni chrome/gesture layer off so the video surface can stay uncovered.
+  bool get hidesFlutterOverlay =>
+      !showVideoBottomControlsBar &&
+      !showPlayPauseReplayButton &&
+      !showSeekBar &&
+      !enableForwardGesture &&
+      !enableBackwardGesture &&
+      !showMuteUnMuteButton &&
+      !showFullScreenButton &&
+      !alwaysShowBottomControlsBar;
+
   /// Creates a new instance of [PlayerUIVisibilityOptions].
   ///
   /// All options default to `true` except:
