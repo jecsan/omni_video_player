@@ -39,9 +39,10 @@ class YouTubeWebViewEventHandler {
       orElse: () => YoutubePlayerState.unknown,
     );
 
-    controller
-      ..isReady = true
-      ..isBuffering = false;
+    controller.isBuffering = false;
+    if (!_isDurationUnset) {
+      controller.isReady = true;
+    }
 
     // Initialize controller when duration is not yet available
     if (_isDurationUnset) {
@@ -78,7 +79,11 @@ class YouTubeWebViewEventHandler {
       controller
         ..isReady = false
         ..hasStarted = false;
-      controller.pause(useGlobalController: false);
+      // Pausing here dumps YouTube back to its white unstarted chrome. Reels
+      // autoplay through that gap; keep the iframe playing while duration loads.
+      if (!configuration.videoSourceConfiguration.autoPlay) {
+        controller.pause(useGlobalController: false);
+      }
 
       int? durationSeconds;
       if (!controller.isLive) {

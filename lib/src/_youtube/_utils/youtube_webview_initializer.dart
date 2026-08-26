@@ -55,16 +55,18 @@ class YouTubeWebViewInitializer implements IOmniVideoPlayerInitializerStrategy {
       globalKeyPlayer: config.globalKeyInitializer,
     );
 
-    // Register hero widget after layout is complete
+    // Register the WebView after layout. Skip Hero when chrome is off: Hero
+    // wraps the platform view in an overlay layer that blanks iOS textures.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      controller.sharedPlayerNotifier.value = Hero(
-        tag: config.globalKeyPlayer,
-        child: YouTubeWebViewPlayerView(
-          key: config.globalKeyPlayer,
-          controller: controller,
-          customLoader: config.customPlayerWidgets.loadingWidget,
-        ),
+      final player = YouTubeWebViewPlayerView(
+        key: config.globalKeyPlayer,
+        controller: controller,
+        customLoader: config.customPlayerWidgets.loadingWidget,
       );
+      controller.sharedPlayerNotifier.value =
+          config.playerUIVisibilityOptions.hidesFlutterOverlay
+          ? player
+          : Hero(tag: config.globalKeyPlayer, child: player);
     });
 
     return controller;

@@ -16,15 +16,16 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background: black;
+            background: #000;
+            color-scheme: dark;
         }
 
-        .embed-container {
+        .embed-container,
+        #<<playerId>> {
             position: relative;
             width: 100%;
             height: 100%;
-            background: black;
-            transition: background-color 0.2s ease;
+            background: #000;
         }
 
         .embed-container iframe {
@@ -33,6 +34,7 @@
             left: 0;
             width: 100% !important;
             height: 100% !important;
+            background: #000 !important;
             /* The iframe is fully non-interactive: all gestures are handled by
                the Flutter overlay (the WebView is also wrapped in IgnorePointer).
                This stops YouTube's native player from reacting to taps/hover and
@@ -55,6 +57,9 @@
 
     function onYouTubeIframeAPIReady() {
         player = new YT.Player("<<playerId>>", {
+            videoId: "<<videoId>>",
+            width: window.innerWidth,
+            height: window.innerHeight,
             host: "https://www.youtube-nocookie.com",
             playerVars: <<playerVars>>,
             events: {
@@ -63,7 +68,6 @@
                 onError: function(e){ sendMessage("PlayerError", e.data); }
             }
         });
-        player.setSize(window.innerWidth, window.innerHeight);
     }
 
     // Force captions / transcript off. cc_load_policy=0 only means "not on by

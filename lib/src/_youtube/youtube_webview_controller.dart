@@ -120,7 +120,6 @@ class YouTubeWebViewController extends OmniPlaybackController {
       handlerName: 'Ready',
       callback: (_) async {
         if (!_isLoadedVideo) {
-          await loadVideoById(videoId: videoId!);
           _isLoadedVideo = true;
           play(useGlobalController: false);
         }

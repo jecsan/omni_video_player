@@ -140,22 +140,31 @@ class _OmniVideoPlayerViewState extends State<OmniVideoPlayerView> {
     OmniVideoPlayerThemeData theme,
     double aspectRatio,
   ) {
+    final viewport = VisibilityDetector(
+      key: Key('video-visibility-${controller.hashCode}'),
+      onVisibilityChanged: _handleVisibilityChanged,
+      child: RouteAwareListener(
+        onPopNext: (_) {},
+        child: OmniVideoPlayerViewport(
+          controller: controller,
+          isFullScreenDisplay: false,
+          aspectRatio: aspectRatio,
+        ),
+      ),
+    );
+
+    // ClipRRect and OverlayTransitionSwitcher (AnimatedSwitcher/Opacity) create
+    // Flutter layers that blank iOS texture platform views. Chrome-off callers
+    // have no rounded chrome to clip, so skip both.
+    if (config.playerUIVisibilityOptions.hidesFlutterOverlay) {
+      return viewport;
+    }
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(theme.shapes.borderRadius),
       child: OverlayTransitionSwitcher(
         duration: const Duration(milliseconds: 400),
-        child: VisibilityDetector(
-          key: Key('video-visibility-${controller.hashCode}'),
-          onVisibilityChanged: _handleVisibilityChanged,
-          child: RouteAwareListener(
-            onPopNext: (_) {},
-            child: OmniVideoPlayerViewport(
-              controller: controller,
-              isFullScreenDisplay: false,
-              aspectRatio: aspectRatio,
-            ),
-          ),
-        ),
+        child: viewport,
       ),
     );
   }

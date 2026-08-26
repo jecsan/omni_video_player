@@ -88,7 +88,7 @@ class _YouTubeWebViewPlayerViewState extends State<YouTubeWebViewPlayerView> {
     );
 
     final playerVars = jsonEncode({
-      'autoplay': 0,
+      'autoplay': widget.controller.options.videoSourceConfiguration.autoPlay ? 1 : 0,
       'mute': 1,
       'cc_lang_pref': 'en',
       'cc_load_policy': 0,
@@ -108,6 +108,7 @@ class _YouTubeWebViewPlayerViewState extends State<YouTubeWebViewPlayerView> {
 
     final html = rawHtml
         .replaceAll('<<playerId>>', widget.controller.playerId)
+        .replaceAll('<<videoId>>', widget.controller.videoId ?? '')
         .replaceAll('<<host>>', 'https://www.youtube-nocookie.com')
         .replaceAll('<<playerVars>>', playerVars)
         .replaceAll('<<pointerEvents>>', native ? 'auto' : 'none');
@@ -118,10 +119,12 @@ class _YouTubeWebViewPlayerViewState extends State<YouTubeWebViewPlayerView> {
   @override
   Widget build(BuildContext context) {
     if (_htmlContent == null) {
-      return Center(child: widget.customLoader);
+      return const ColoredBox(color: Colors.black, child: SizedBox.expand());
     }
 
     final native = widget.controller.usesNativeCenterControls;
+    final chromeOff =
+        widget.controller.options.playerUIVisibilityOptions.hidesFlutterOverlay;
     return IgnorePointer(
       ignoring: !native, // native mode: iframe interactive (YouTube handles taps)
       child: InAppWebView(
@@ -134,13 +137,13 @@ class _YouTubeWebViewPlayerViewState extends State<YouTubeWebViewPlayerView> {
         initialSettings: InAppWebViewSettings(
           mediaPlaybackRequiresUserGesture: false,
           allowsInlineMediaPlayback: true,
-          // Keep texture-based composition (not hybrid): hybrid composition
-          // composites the WebView in the native view hierarchy, and with the
-          // Flutter controls overlaid on top it forces per-frame texture copies
-          // that make YouTube playback stutter.
-          useHybridComposition: false,
+          // Chrome-off reels have no Flutter overlay, so hybrid composition is
+          // safe and lets WKWebView paint frames. Texture mode plus ClipRRect /
+          // Opacity ancestors blanks the video and leaves a white WKWebView pane.
+          // Default chrome still uses texture to avoid stutter under overlays.
+          useHybridComposition: chromeOff,
           useWideViewPort: false,
-          transparentBackground: false,
+          transparentBackground: true,
           disableContextMenu: true,
           supportZoom: false,
           disableHorizontalScroll: true,
