@@ -120,6 +120,12 @@ class YouTubeWebViewController extends OmniPlaybackController {
       handlerName: 'Ready',
       callback: (_) async {
         if (!_isLoadedVideo) {
+          // Autoplay reels cue via YT.Player(videoId) and just play().
+          // Chrome-on podcast (autoPlay: false) still needs loadVideoById
+          // or the iframe never fetches the stream.
+          if (!options.videoSourceConfiguration.autoPlay) {
+            await loadVideoById(videoId: videoId!);
+          }
           _isLoadedVideo = true;
           play(useGlobalController: false);
         }

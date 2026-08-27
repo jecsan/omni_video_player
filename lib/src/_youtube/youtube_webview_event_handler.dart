@@ -40,7 +40,10 @@ class YouTubeWebViewEventHandler {
     );
 
     controller.isBuffering = false;
-    if (!_isDurationUnset) {
+    // Autoplay reels stay gated on a real duration so the loader does not
+    // flash over an empty iframe. Chrome-on podcast would otherwise hang
+    // on that loader while duration stays unset (Germaine keep-loading).
+    if (!configuration.videoSourceConfiguration.autoPlay || !_isDurationUnset) {
       controller.isReady = true;
     }
 
@@ -76,9 +79,13 @@ class YouTubeWebViewEventHandler {
     if (_initializing) return;
     _initializing = true;
     try {
-      controller
-        ..isReady = false
-        ..hasStarted = false;
+      controller.hasStarted = false;
+      // Autoplay reels keep isReady false until duration is known. Chrome-on
+      // podcast already flipped isReady above; do not put it back or the
+      // loader hangs for the whole duration poll.
+      if (configuration.videoSourceConfiguration.autoPlay) {
+        controller.isReady = false;
+      }
       // Pausing here dumps YouTube back to its white unstarted chrome. Reels
       // autoplay through that gap; keep the iframe playing while duration loads.
       if (!configuration.videoSourceConfiguration.autoPlay) {

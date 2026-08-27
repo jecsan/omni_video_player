@@ -143,7 +143,10 @@ class _YouTubeWebViewPlayerViewState extends State<YouTubeWebViewPlayerView> {
           // Default chrome still uses texture to avoid stutter under overlays.
           useHybridComposition: chromeOff,
           useWideViewPort: false,
-          transparentBackground: true,
+          // Chrome-off reels need a transparent WKWebView so hybrid frames
+          // paint. Chrome-on podcast stays opaque; transparent + texture
+          // composition blanks the iframe.
+          transparentBackground: chromeOff,
           disableContextMenu: true,
           supportZoom: false,
           disableHorizontalScroll: true,
