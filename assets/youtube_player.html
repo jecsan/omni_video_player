@@ -113,6 +113,11 @@
         return '';
     }
 
+    function cueById(settings) {
+        try{ player.cueVideoById(settings); } catch(e){}
+        return '';
+    }
+
     window.onresize = function(){ try{ player.setSize(window.innerWidth, window.innerHeight); } catch(e){} };
     function sendMessage(key,data){
         var msg={};

@@ -34,7 +34,10 @@ class _YouTubeWebViewPlayerViewState extends State<YouTubeWebViewPlayerView> {
     if (uri == null) return true;
     final scheme = uri.scheme;
     // Initial / in-memory loads.
-    if (scheme.isEmpty || scheme == 'data' || scheme == 'about' || scheme == 'blob') {
+    if (scheme.isEmpty ||
+        scheme == 'data' ||
+        scheme == 'about' ||
+        scheme == 'blob') {
       return true;
     }
     final host = uri.host;
@@ -88,7 +91,9 @@ class _YouTubeWebViewPlayerViewState extends State<YouTubeWebViewPlayerView> {
     );
 
     final playerVars = jsonEncode({
-      'autoplay': widget.controller.options.videoSourceConfiguration.autoPlay ? 1 : 0,
+      'autoplay': widget.controller.options.videoSourceConfiguration.autoPlay
+          ? 1
+          : 0,
       'mute': 1,
       'cc_lang_pref': 'en',
       'cc_load_policy': 0,
@@ -126,7 +131,8 @@ class _YouTubeWebViewPlayerViewState extends State<YouTubeWebViewPlayerView> {
     final chromeOff =
         widget.controller.options.playerUIVisibilityOptions.hidesFlutterOverlay;
     return IgnorePointer(
-      ignoring: !native, // native mode: iframe interactive (YouTube handles taps)
+      ignoring:
+          !native, // native mode: iframe interactive (YouTube handles taps)
       child: InAppWebView(
         initialData: InAppWebViewInitialData(
           data: _htmlContent!,
@@ -178,6 +184,7 @@ class _YouTubeWebViewPlayerViewState extends State<YouTubeWebViewPlayerView> {
             'google.com',
             'googlevideo.com',
             'ytimg.com',
+            'ggpht.com',
             'gstatic.com',
             'googleapis.com',
           ];

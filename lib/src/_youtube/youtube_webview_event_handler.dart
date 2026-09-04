@@ -86,11 +86,8 @@ class YouTubeWebViewEventHandler {
       if (configuration.videoSourceConfiguration.autoPlay) {
         controller.isReady = false;
       }
-      // Pausing here dumps YouTube back to its white unstarted chrome. Reels
-      // autoplay through that gap; keep the iframe playing while duration loads.
-      if (!configuration.videoSourceConfiguration.autoPlay) {
-        controller.pause(useGlobalController: false);
-      }
+      // Do not pause here. Chrome-on used to pause after Ready play(); on
+      // iOS that dumps YouTube to white unstarted (state 3 then -1).
 
       int? durationSeconds;
       if (!controller.isLive) {

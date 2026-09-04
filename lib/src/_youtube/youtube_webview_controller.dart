@@ -113,6 +113,17 @@ class YouTubeWebViewController extends OmniPlaybackController {
     );
   }
 
+  Future<void> cueVideoById({required String videoId}) async {
+    final loadData = {
+      'videoId': videoId,
+      'startSeconds': 0,
+      'endSeconds': null,
+    };
+    await webViewController?.evaluateJavascript(
+      source: 'cueById(${jsonEncode(loadData)});',
+    );
+  }
+
   String get playerId => 'Youtube$hashCode';
 
   void _initJavaScriptHandlers() {
@@ -120,14 +131,15 @@ class YouTubeWebViewController extends OmniPlaybackController {
       handlerName: 'Ready',
       callback: (_) async {
         if (!_isLoadedVideo) {
-          // Autoplay reels cue via YT.Player(videoId) and just play().
-          // Chrome-on podcast (autoPlay: false) still needs loadVideoById
-          // or the iframe never fetches the stream.
+          // Autoplay reels: YT.Player(videoId) then play().
+          // Chrome-on podcast: cue, do not play. loadVideoById+play then
+          // init pause() dumps iOS WKWebView to white unstarted (state 3 then -1).
           if (!options.videoSourceConfiguration.autoPlay) {
-            await loadVideoById(videoId: videoId!);
+            await cueVideoById(videoId: videoId!);
+          } else {
+            play(useGlobalController: false);
           }
           _isLoadedVideo = true;
-          play(useGlobalController: false);
         }
       },
     );
