@@ -198,8 +198,8 @@ class _YouTubeWebViewPlayerViewState extends State<YouTubeWebViewPlayerView> {
                 : ServerTrustAuthResponseAction.CANCEL,
           );
         },
-        onLoadStart: (_, _) => widget.controller.isReady = false,
-        onLoadStop: (_, _) => widget.controller.isReady = false,
+        onLoadStart: (_, _) => widget.controller.onEmbeddedPlayerLoad(),
+        onLoadStop: (_, _) => widget.controller.onEmbeddedPlayerLoad(),
         onProgressChanged: (_, progress) =>
             widget.controller.isBuffering = progress != 100,
         shouldOverrideUrlLoading: (controller, navigationAction) async {

@@ -132,4 +132,27 @@ void main() {
     expect(html, contains('function cueById'));
     expect(html, contains('player.cueVideoById'));
   });
+
+  test('webview load after Ready keeps chrome-on isReady', () async {
+    final c = _youtube(autoPlay: false);
+    await c.onPlayerReady();
+    c.isReady = true;
+    c.onEmbeddedPlayerLoad();
+    expect(
+      c.isReady,
+      isTrue,
+      reason:
+          'cueVideoById retriggers InAppWebView onLoadStart/Stop; wiping isReady '
+          'leaves the podcast loader up after duration is already known',
+    );
+    c.dispose();
+  });
+
+  test('webview load before Ready still clears isReady', () {
+    final c = _youtube(autoPlay: false);
+    c.isReady = true;
+    c.onEmbeddedPlayerLoad();
+    expect(c.isReady, isFalse);
+    c.dispose();
+  });
 }

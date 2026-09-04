@@ -124,22 +124,33 @@ class YouTubeWebViewController extends OmniPlaybackController {
 
   String get playerId => 'Youtube$hashCode';
 
+  /// Ready from the IFrame API. Constructor already has videoId; chrome-on
+  /// cues (no play), autoplay reels play.
+  Future<void> onPlayerReady() async {
+    if (_isLoadedVideo) return;
+    // Autoplay reels: YT.Player(videoId) then play().
+    // Chrome-on podcast: cue, do not play. loadVideoById+play then
+    // init pause() dumps iOS WKWebView to white unstarted (state 3 then -1).
+    if (!options.videoSourceConfiguration.autoPlay) {
+      await cueVideoById(videoId: videoId!);
+    } else {
+      play(useGlobalController: false);
+    }
+    _isLoadedVideo = true;
+  }
+
+  /// InAppWebView onLoadStart/Stop. Cue and iframe navigations keep firing
+  /// these after Ready. Wiping isReady puts the chrome-on loader back even
+  /// after duration is known (ICS-3558 keep-loading).
+  void onEmbeddedPlayerLoad() {
+    if (_isLoadedVideo) return;
+    isReady = false;
+  }
+
   void _initJavaScriptHandlers() {
     webViewController?.addJavaScriptHandler(
       handlerName: 'Ready',
-      callback: (_) async {
-        if (!_isLoadedVideo) {
-          // Autoplay reels: YT.Player(videoId) then play().
-          // Chrome-on podcast: cue, do not play. loadVideoById+play then
-          // init pause() dumps iOS WKWebView to white unstarted (state 3 then -1).
-          if (!options.videoSourceConfiguration.autoPlay) {
-            await cueVideoById(videoId: videoId!);
-          } else {
-            play(useGlobalController: false);
-          }
-          _isLoadedVideo = true;
-        }
-      },
+      callback: (_) => onPlayerReady(),
     );
     webViewController?.addJavaScriptHandler(
       handlerName: 'StateChange',
