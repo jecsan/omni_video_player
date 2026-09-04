@@ -114,13 +114,11 @@ class YouTubeWebViewController extends OmniPlaybackController {
   }
 
   Future<void> cueVideoById({required String videoId}) async {
-    final loadData = {
-      'videoId': videoId,
-      'startSeconds': 0,
-      'endSeconds': null,
-    };
+    // Call the IFrame API on `player`, not window.cueById. New HTML helpers
+    // are missing after hot restart / cached package assets, which threw
+    // TypeError and tripped the 15s ready timeout (Duplicate GlobalKey).
     await webViewController?.evaluateJavascript(
-      source: 'cueById(${jsonEncode(loadData)});',
+      source: 'String(player.cueVideoById(${jsonEncode(videoId)}));',
     );
   }
 

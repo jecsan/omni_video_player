@@ -37,6 +37,12 @@ void main() {
       expect(src, contains('if (!options.videoSourceConfiguration.autoPlay)'));
       expect(src, contains('await cueVideoById(videoId: videoId!)'));
       expect(
+        src,
+        contains('player.cueVideoById'),
+        reason: 'Must call IFrame API on player; window.cueById is missing in cached HTML',
+      );
+      expect(src, isNot(contains("'cueById(")));
+      expect(
         src.contains(
           '_isLoadedVideo = true;\n          play(useGlobalController: false);',
         ),
