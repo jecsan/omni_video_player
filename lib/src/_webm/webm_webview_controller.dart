@@ -278,6 +278,10 @@ class WebmVideoWebViewController extends OmniPlaybackController {
 
   @override
   Future<void> pause({bool useGlobalController = true}) async {
+    wasPlayingBeforeGoOnFullScreen = null;
+    wasPlayingBeforeSeek = false;
+    isSeeking = false;
+    isPlaying = false;
     if (useGlobalController && _globalController != null && !isFullScreen) {
       return await _globalController.requestPause();
     } else {
@@ -350,6 +354,7 @@ class WebmVideoWebViewController extends OmniPlaybackController {
     void Function(bool p1)? onToggle,
   }) async {
     if (isFullScreen) {
+      wasPlayingBeforeGoOnFullScreen = null;
       isFullScreen = false;
       notifyListeners();
       onToggle?.call(false);

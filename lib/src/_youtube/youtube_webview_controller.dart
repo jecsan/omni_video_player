@@ -383,6 +383,13 @@ class YouTubeWebViewController extends OmniPlaybackController {
 
   @override
   Future<void> pause({bool useGlobalController = true}) async {
+    // Explicit user pause overrides incidental fullscreen-recovery and
+    // seek-resume, including the seek fallback timer. Same contract as
+    // GenericPlaybackController.pause.
+    wasPlayingBeforeGoOnFullScreen = null;
+    wasPlayingBeforeSeek = false;
+    isSeeking = false;
+    isPlaying = false;
     if (useGlobalController && _globalController != null && !isFullScreen) {
       return await _globalController.requestPause();
     } else {
@@ -457,6 +464,7 @@ class YouTubeWebViewController extends OmniPlaybackController {
     void Function(bool p1)? onToggle,
   }) async {
     if (isFullScreen) {
+      wasPlayingBeforeGoOnFullScreen = null;
       isFullScreen = false;
       notifyListeners();
       onToggle?.call(false);

@@ -224,6 +224,9 @@ class VimeoController extends OmniPlaybackController {
 
   @override
   Future<void> pause({bool useGlobalController = true}) async {
+    wasPlayingBeforeSeek = false;
+    isSeeking = false;
+    isPlaying = false;
     if (useGlobalController && _globalController != null) {
       return await _globalController.requestPause();
     } else {
