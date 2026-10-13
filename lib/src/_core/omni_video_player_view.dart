@@ -110,7 +110,12 @@ class _OmniVideoPlayerViewState extends State<OmniVideoPlayerView> {
                     .fitVideoToBounds ||
                 _getAspectRatio() < 1,
             wrapWith: (ctx, child) => Positioned.fill(child: child),
-            child: _buildVideoDisplay(context, theme, aspectRatio),
+            // Own semantics node, so the platform view keeps the same semantics
+            // parent when the loader and thumbnail siblings come and go.
+            child: Semantics(
+              container: true,
+              child: _buildVideoDisplay(context, theme, aspectRatio),
+            ),
           ),
           if (_shouldShowThumbnailPreview())
             Positioned.fill(
