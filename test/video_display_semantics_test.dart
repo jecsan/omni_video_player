@@ -9,9 +9,15 @@ import 'package:omni_video_player/src/_core/omni_video_player_view.dart';
 /// Only what [OmniVideoPlayerView] and its overlay read while loading and once ready.
 class _FakeController extends OmniPlaybackController {
   bool ready = false;
+  bool started = false;
 
   void becomeReady() {
     ready = true;
+    notifyListeners();
+  }
+
+  void start() {
+    started = true;
     notifyListeners();
   }
 
@@ -27,7 +33,7 @@ class _FakeController extends OmniPlaybackController {
   @override
   bool get isFullScreen => false;
   @override
-  bool get hasStarted => false;
+  bool get hasStarted => started;
   @override
   bool get isFinished => false;
   @override
@@ -92,9 +98,14 @@ void main() {
     controller.becomeReady();
     await tester.pump();
 
-    expect(tester.takeException(), isNull);
-    final after = tester.getSemantics(find.bySemanticsLabel('video surface'));
-    expect(after.parent?.id, before.parent?.id);
+    final afterLoader = tester.getSemantics(find.bySemanticsLabel('video surface'));
+    expect(afterLoader.parent?.id, before.parent?.id, reason: 'The loader left');
+
+    controller.start();
+    await tester.pump();
+
+    final afterThumbnail = tester.getSemantics(find.bySemanticsLabel('video surface'));
+    expect(afterThumbnail.parent?.id, before.parent?.id, reason: 'The thumbnail left on first play');
     semantics.dispose();
   });
 }
